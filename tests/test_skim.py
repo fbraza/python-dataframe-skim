@@ -1,4 +1,4 @@
-from .skim import skim, __shape
+from .skim import check_types, data_summary
 import unittest
 import pandas as pd
 
@@ -26,27 +26,25 @@ class TestObjectTypes(unittest.TestCase):
         self.assertTrue(with_df)
 
     def test_exception_raised_if_not_good_type(self) -> None:
-        self.assertRaises(AttributeError, skim, self.ls)
+        self.assertRaises(AttributeError, check_types, self.ls)
 
 
 class TestDataSummary(unittest.TestCase):
     def setUp(self) -> None:
         self.df = pd.DataFrame(
-            data=[[1, 'a'],[2, 'b'],[3, 'c']],
+            data=[[1, 'a'], [2, 'b'], [3, 'c']],
             columns=['numbers', 'letters']
             )
 
-    def test_df_shape_with_pandas_dataframe(self) -> None:
-        result = __shape(self.df)
-        expected = pd.DataFrame(data=[[3], [2]], columns=['Values'], index=['Number of rows', 'Number of columns'])
+    def test_data_summary(self) -> None:
+        result = data_summary(self.df)
+        expected = pd.DataFrame(
+            data=[[3], [2], [1], [1]],
+            columns=['Values'],
+            index=['Number of rows', 'Number of columns', 'int64', 'object']
+            )
         self.assertTrue(expected.equals(result))
 
-    def test_df_shape_with_pandas_series(self) -> None:
-        result = __shape(self.df)
-        expected = pd.DataFrame(data=[[3], [2]], columns=['Values'], index=['Number of rows', 'Number of columns'])
-        self.assertTrue(expected.equals(result))
 
 if __name__ == '__main__':
     unittest.main()
-
-
