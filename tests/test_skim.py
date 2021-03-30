@@ -1,4 +1,4 @@
-from .skim import check_types, data_summary
+from skim.skim import check_types, data_summary
 import unittest
 import pandas as pd
 

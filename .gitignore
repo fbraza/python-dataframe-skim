@@ -1,5 +1,6 @@
-# VS Code
+# IDEs
 .vscode/
+.vim/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -78,7 +79,7 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+*.ipynb*
 
 # IPython
 profile_default/
@@ -130,3 +131,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Commitizen & pre-commit
+.pre-commit-config.yaml
+
+# Data
+.csv
