@@ -6,7 +6,6 @@ authors = ["fbraza <fbraza@tutanota.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8.7"
-pre-commit = "^2.11.1"
 
 [tool.poetry.dev-dependencies]
 pynvim = "^0.4.3"
@@ -17,6 +16,8 @@ numpy = "^1.20.2"
 pytest = "^6.2.2"
 commitizen = "^2.16.0"
 pre-commit = "^2.11.1"
+jedi = "*"
+python-language-server = { version = "*", extras = ["all"]}
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
