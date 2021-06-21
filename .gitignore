@@ -131,6 +131,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+pyrightconfig.json
 
 # Commitizen & pre-commit
 .pre-commit-config.yaml
