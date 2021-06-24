@@ -1,6 +1,6 @@
 import pytest
 import pandas as pd
-from skim.skim import skim
+from pandas_utils.skim import skim, Skimer
 
 
 @pytest.fixture
@@ -15,10 +15,8 @@ def dummy_types():
 
 
 @pytest.fixture
-def dummy_df():
-    data, cols = [[1, 'a'], [2, 'b'], [3, 'c']], ['numbers', 'letters']
-    df1 = pd.DataFrame(data=data, columns=cols)
-    return df1
+def iris_csv():
+    return pd.read_csv("tests/data/iris.csv")
 
 
 def test_skim_should_raise_error_if_incorrect_type_is_passed(dummy_types):
@@ -28,55 +26,28 @@ def test_skim_should_raise_error_if_incorrect_type_is_passed(dummy_types):
             skim(dummy_types[type])
 
 
-# class TestDataSummary(unittest.TestCase):
-#     def setUp(self):
-#         data, cols = [[1, 'a'], [2, 'b'], [3, 'c']], ['numbers', 'letters']
-#         self.df1 = pd.DataFrame(data=data, columns=cols)
-
-#     def test_shape(self):
-#         cols, idx = ['Values'], ['Number of rows', 'Number of columns']
-#         data = [[3], [2]]
-#         row, col = self.df1.shape
-#         expected = pd.DataFrame(data=data, columns=cols, index=idx)
-#         result = pd.DataFrame(data=[[row], [col]], columns=cols, index=idx)
-#         self.assertTrue(result.equals(expected))
-
-#     def test_type_freq(self):
-#         counter, types = {}, self.df1.dtypes
-#         for dtype in types:
-#             tmp = str(dtype)
-#             if tmp in counter.keys():
-#                 counter[tmp] += 1
-#             else:
-#                 counter[tmp] = 1
-#         values = [[value] for value in counter.values()]
-#         cols, idx = ['Values'], list(counter.keys())
-#         result = pd.DataFrame(data=values, columns=cols, index=idx)
-#         # expected data
-#         data = [[1], [1]]
-#         expected = pd.DataFrame(data=data, columns=cols, index=idx)
-#         self.assertTrue(result.equals(expected))
-
-#     def test_data_summary(self):
-#         data, cols = [[3], [2], [1], [1]], ['Values']
-#         idx = ['Number of rows', 'Number of columns', 'int64', 'object']
-#         result = SkimData(self.df1).data_summary()
-#         expected = pd.DataFrame(data=data, columns=cols, index=idx)
-#         print(result)
-#         self.assertTrue(expected.equals(result))
+def test_dataframe_summary_on_iris_dataset(iris_csv):
+    sk_summary = Skimer(iris_csv).summary
+    expected_summary = [
+        ("Number of rows", "150"),
+        ("Number of columns", "5"),
+        ("The frequency of float64", "4"),
+        ("The frequency of object", "1")
+        ]
+    assert sk_summary == expected_summary
 
 
-# class TestNumericSummary(unittest.TestCase):
-#     def setUp(self):
-#         data = [[1, 'a', 3.4], [2, 'b', 5.5], [3, 'c', 6.8]]
-#         cols = ['integer', 'letters', 'floats']
-#         self.df2 = pd.DataFrame(data=data, columns=cols)
-
-#     def test_select_numeric(self):
-#         types = ['int8', 'int16', 'int32', 'int64',
-#                  'uint8', 'uint16', 'uint32', 'uint64',
-#                  'float16', 'float32', 'float64', 'float128']
-#         data, cols = [[1, 3.4], [2, 5.5], [3, 6.8]], ['integer', 'floats']
-#         result = self.df2.select_dtypes(include=types)
-#         expected = pd.DataFrame(data=data, columns=cols)
-#         self.assertTrue(result.equals(expected))
+def test_numeric_summary_returns_on_iris_dataset(iris_csv):
+    sk_numeric = Skimer(iris_csv).numeric
+    assert sk_numeric["variable"] == ["sepal_length", "sepal_width",
+                                      "petal_length", "petal_width"]
+    assert sk_numeric["missing"] == ["0", "0", "0", "0"]
+    assert sk_numeric["min"] == ["4.3", "2.0", "1.0", "0.1"]
+    assert sk_numeric["max"] == ["7.9", "4.4", "6.9", "2.5"]
+    assert sk_numeric["mean"] == ["5.843", "3.054", "3.759", "1.199"]
+    assert sk_numeric["sd"] == ["0.828", "0.434", "1.764", "0.763"]
+    assert sk_numeric["q0"] == ["4.3", "2.0", "1.0", "0.1"]
+    assert sk_numeric["q25"] == ["5.1", "2.8", "1.6", "0.3"]
+    assert sk_numeric["q50"] == ["5.8", "3.0", "4.35", "1.3"]
+    assert sk_numeric["q75"] == ["6.4", "3.3", "5.1", "1.8"]
+    assert sk_numeric["q100"] == ["7.9", "4.4", "6.9", "2.5"]
