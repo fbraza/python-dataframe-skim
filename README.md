@@ -1,6 +1,6 @@
 # Po
 
-![po_image](po.jpg)
+![po_image](.assets/po.jpg)
 
 Helper methods for Pandas DataFrames to improve analyst and data scientist productivity.
 Po proposes different modules to:
