@@ -1,6 +1,7 @@
+from typing import Dict, List, Optional
 import pytest
 import pandas as pd
-from pandas_utils.skim import skim, Skimer
+from po.skim import skim, Skimer
 
 
 @pytest.fixture
@@ -27,7 +28,7 @@ def test_skim_should_raise_error_if_incorrect_type_is_passed(dummy_types):
 
 
 def test_dataframe_summary_on_iris_dataset(iris_csv):
-    sk_summary = Skimer(iris_csv).summary
+    sk_summary = Skimer(data=iris_csv, name="Iris").summary
     expected_summary = [
         ("Number of rows", "150"),
         ("Number of columns", "5"),
@@ -38,7 +39,7 @@ def test_dataframe_summary_on_iris_dataset(iris_csv):
 
 
 def test_numeric_summary_returns_on_iris_dataset(iris_csv):
-    sk_numeric = Skimer(iris_csv).numeric
+    sk_numeric: Optional[Dict[str, List]] = Skimer(data=iris_csv, name="Iris").numeric
     assert sk_numeric["variable"] == ["sepal_length", "sepal_width",
                                       "petal_length", "petal_width"]
     assert sk_numeric["missing"] == ["0", "0", "0", "0"]
