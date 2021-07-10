@@ -1,11 +1,15 @@
-# Po
+# ![](assets/skimpy.png)
 
-![po_image](https://github.com/fbraza/Po/blob/main/assets/po.jpg)
+## Functionality
 
-Get an extended statistics summary of your Pandas DataFrames (inspired by [skimR](https://github.com/ropensci/skimr)).
+If pandas DataFrame `info()` and `describe()` methods had a baby this would be `skimpy`. It produces an extended statistics summary of your Pandas DataFrames.
 
 ## Setup
 
 ## Usage
+
+## Acknowledgments
+
+
 
 # :exclamation: work in progress :exclamation:
