@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from typing import List, Tuple
+from typing import List, Optional, Tuple
 from collections import Counter
 
 
@@ -25,10 +25,20 @@ TYPES = {
 }
 
 
-def columns_with_type(data: pd.DataFrame, dtype: str) -> pd.DataFrame:
+def columns_with_type(
+    data: pd.DataFrame,
+    dtype: str
+) -> pd.DataFrame:
     """
-    Function defined to select all DataFrame columns with a specified
-    type. You can choose between numeric, object, category and date.
+    Select all columns with the specified type.
+
+    Args:
+    -----
+    - data:
+    - dtype: stting ("numeric", "object", "category", "date")
+
+    Return:
+    -------
     """
     def is_type_in(_dtype: str) -> bool:
         return _dtype in TYPES[dtype]
@@ -37,16 +47,36 @@ def columns_with_type(data: pd.DataFrame, dtype: str) -> pd.DataFrame:
     return data.select_dtypes(include=filtered_type)
 
 
-def columns_to_list(data: pd.DataFrame) -> List:
+def columns_to_list(
+    data: pd.DataFrame
+) -> List:
     """
-    TODO
+    Function defined to select all columns with a specified type.
+
+    Args:
+    -----
+    - data:
+
+    Return:
+    -------
+
     """
     return list(data.columns)
 
 
-def calculate_quantiles(data: pd.DataFrame) -> Tuple[List[str], ...]:
+def calculate_quantiles(
+    data: pd.DataFrame
+) -> Tuple[List[str], ...]:
     """
-    TODO
+    Calculate quantiles of a Pandas Series
+
+    Args:
+    -----
+    - data:
+
+    Return:
+    -------
+
     """
     q0, q25, q50, q75, q100 = data.quantile([.0, .25, .50, .75, 1.0]).values
     q0 = [str(value) for value in q0]
@@ -57,21 +87,91 @@ def calculate_quantiles(data: pd.DataFrame) -> Tuple[List[str], ...]:
     return (q0, q25, q50, q75, q100)
 
 
-def calculate_means(data: pd.DataFrame, columns: List[str]) -> List[str]:
+def calculate_means(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> List[str]:
     """
-    TODO
+    Calculate the mean of all Pandas Dataframe columns
+
+    Args:
+    -----
+    - data:
+    - columns:
+
+    Return:
+    -------
+
     """
     return [str(round(data[column].mean(), 3)) for column in columns]
 
 
-def calculate_sd(data: pd.DataFrame, columns: List[str]) -> List[str]:
+def calculate_sd(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> List[str]:
     """
-    TODO
+    Calculate the standard deviation of all Pandas Dataframe columns
+
+    Args:
+    -----
+    - data:
+    - columns:
+
+    Return:
+    -------
+
     """
-    return [str(data[column].sd) for column in columns]
+    return [str(round(data[column].std(), 3)) for column in columns]
 
 
-def spark_bar(data: pd.Series, bins: int) -> str:
+def calculate_skew(
+    data: pd.DataFrame,
+    columns: List[str],
+    skipna: Optional[bool] = None
+) -> List[str]:
+    """
+    Calculate the skew factors of all Pandas Dataframe columns
+
+    Args:
+    -----
+    - data:
+    - columns:
+    - skipna:
+
+    Return:
+    -------
+
+    """
+    return [str(round(data[column].skew(skipna=skipna), 3)) for column in columns]
+
+
+def calculate_kurosis(
+        data: pd.DataFrame,
+        columns: List[str],
+        skipna: Optional[bool] = None
+) -> List[str]:
+    """
+    Calculate the kurtosis of all Pandas Dataframe columns
+
+    Args:
+    -----
+    - data:
+    - columns:
+    - skipna:
+
+    Return:
+    -------
+
+    """
+    return [str(round(data[column].kurtosis(skipna=skipna), 3))
+            for column in columns]
+
+
+def spark_bar(
+    data: pd.Series,
+    bins: int = 10
+) -> str:
     """
     TODO
     """
@@ -82,7 +182,16 @@ def spark_bar(data: pd.Series, bins: int) -> str:
     return hist
 
 
-def count_types_freq(data: pd.DataFrame) -> Counter:
+def draw_distribitions(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> List[str]:
+    return [spark_bar(data[column]) for column in columns]
+
+
+def count_types_freq(
+    data: pd.DataFrame
+) -> Counter:
     """
     TODO
     """
@@ -90,24 +199,34 @@ def count_types_freq(data: pd.DataFrame) -> Counter:
     return Counter(types)
 
 
-def count_columns_values(data: pd.DataFrame, columns: List[str]) -> List[str]:
+def count_columns_values(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> List[str]:
     """
     TODO
     """
     return [str(data[column].count()) for column in columns]
 
 
-def count_missing_values(data: pd.DataFrame, columns: List[str]) -> List[str]:
+def count_missing_values(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> List[str]:
     """
     TODO
     """
     return [str(data[column].isnull().sum()) for column in columns]
 
 
-def columns_min_max(data: pd.DataFrame, columns: List[str]) -> Tuple[List[str], ...]:
+def columns_min_max(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> Tuple[List[str], ...]:
     """
     TODO
     """
     _min = [str(data[column].min()) for column in columns]
     _max = [str(data[column].max()) for column in columns]
     return (_min, _max)
+
