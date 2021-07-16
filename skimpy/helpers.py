@@ -6,22 +6,25 @@ from collections import Counter
 
 TYPES = {
     "numeric": [
-        'int8',
-        'int16',
-        'int32',
-        'int64',
-        'uint8',
-        'uint16',
-        'uint32',
-        'uint64',
-        'float16',
-        'float32',
-        'float64',
-        'float128'
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float16",
+        "float32",
+        "float64",
+        "float128"
         ],
     "object": [
-        'object'
-        ]
+        "object"
+        ],
+    "category": [
+        "category"
+    ]
 }
 
 
@@ -44,10 +47,13 @@ def columns_with_type(
         return _dtype in TYPES[dtype]
     alltypes = [str(dtype) for dtype in data.dtypes.unique()]
     filtered_type = list(filter(is_type_in, alltypes))
-    return data.select_dtypes(include=filtered_type)
+    try:
+        return data.select_dtypes(include=filtered_type)
+    except ValueError:
+        return pd.DataFrame()
 
 
-def columns_to_list(
+def list_columns(
     data: pd.DataFrame
 ) -> List:
     """
@@ -61,7 +67,7 @@ def columns_to_list(
     -------
 
     """
-    return list(data.columns)
+    return list(data)
 
 
 def calculate_quantiles(
@@ -175,7 +181,7 @@ def spark_bar(
     """
     TODO
     """
-    bars = u' ▁▂▃▄▅▆▇█'
+    bars = u" ▁▂▃▄▅▆▇█"
     n, _ = np.histogram(data, bins=bins)
     temp = n * (len(bars) - 1) // (max(n))
     hist = u"".join(bars[i] for i in temp)
