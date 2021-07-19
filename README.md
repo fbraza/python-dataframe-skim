@@ -1,4 +1,4 @@
-![](assets/skimpy.png)
+![](assets/banner_SkimPy.png)
 
 ## Functionality
 
