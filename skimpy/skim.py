@@ -1,122 +1,98 @@
 import pandas as pd
 import helpers as H
-from typing import Dict, List, Optional
+from collections import defaultdict
+from typing import List, Dict, Union
 from rich.console import Console
 from rich.table import Table
 from rich import box
-from collections import defaultdict
 
 
-class Skimer:
-    """
-    TODO
-    """
-    def __init__(
-        self,
-        data: pd.DataFrame,
-        name: str = "My Dataset"
-    ):
-        self.data = data
-        self.name = name
-        self.rows = data.shape[0]
-        self.cols = data.shape[1]
-        # have a a attribute called skimmers that is a defaultdict(dict)
-        self.skimmer: Dict[str, Dict[str, List]] = defaultdict(dict)
+@pd.api.extensions.register_dataframe_accessor("skim")
+class Skim:
+    """TODO"""
 
-    def set_skimmers(self):
-        self._set_sumskim()
-        self._set_numskim()
+    def __init__(self, pandas_obj):
+        self.__typecheck(pandas_obj)
+        self._obj = pandas_obj
 
-    def _set_sumskim(self):
+    @staticmethod
+    def __typecheck(input):
+        if not isinstance(input, pd.DataFrame):
+            raise AttributeError("skim accessor should called on a pandas DataFrame")
+
+    def print(self):
+        # instantiate the rich Console object
+        console = Console()
+        # instantiate the skimmer object
+        data = self.__skim()
+
+        def _build_rich_grid(summary: dict, title: str) -> Table:
+            columns, values = summary.keys(), list(summary.values())
+            size = len(values[0])
+            rows = [[row[i] for row in values] for i in range(size)]
+            grid = Table(
+                box=box.SIMPLE,
+                show_header=True,
+                header_style="italic",
+                title="  Variable type: {}".format(title),
+                title_justify="left",
+                title_style="bold",
+                )
+            for col in columns:
+                grid.add_column(col)
+            for row in rows:
+                grid.add_row(*row)
+            return grid
+        # clear screen
+        console.clear()
+        for key, value in data.items():
+            console.print(_build_rich_grid(value, key))
+
+    def __summary(self):
         """
         TODO
         """
-        _sumskim: Dict[str, List] = defaultdict(list)
-        _sumskim[" "] = ["Number of rows", "Number of columns"]
-        _sumskim["Values"] = [str(self.rows), str(self.cols)]
-        dtypes_freq = H.count_types_freq(self.data)
+        rows, cols = self._obj.shape[0], self._obj.shape[1]
+        data = defaultdict(list)
+        data[" "] = ["Number of rows", "Number of columns"]
+        data["Values"] = [str(rows), str(cols)]
+        dtypes_freq = H.count_types_freq(self._obj)
         for k, v in dtypes_freq.items():
-            _sumskim[" "].append("The frequency of {}".format(k))
-            _sumskim["Values"].append(str(v))
-        self.skimmer["summary"] = _sumskim
+            data[" "].append("The frequency of {}".format(k))
+            data["Values"].append(str(v))
+        return data
 
-    def _set_numskim(self) -> Optional[None]:
+    def __numeric(self) -> Union[Dict[str, List], Dict[str, bool]]:
         """
         TODO
         """
-        _numskim: Dict[str, List] = defaultdict(list)
-        data = H.columns_with_type(self.data, "numeric")
-        cols = H.list_columns(data)
+        data = defaultdict(list)
+        subset = H.columns_with_type(self._obj, "numeric")
+        cols = H.list_columns(subset)
         if not cols:
-            self.skimmer["numeric"] = {}
+            return {"empty": True}
         # statistic calculations
-        q0, q25, q50, q75, q100 = H.calculate_quantiles(data)
-        _min, _max = H.columns_min_max(data, cols)
-        _numskim["Variable"] = cols
-        _numskim["Count_total"] = H.count_columns_values(data, cols)
-        _numskim["Count_missing"] = H.count_missing_values(data, cols)
-        _numskim["Min"] = _min
-        _numskim["Max"] = _max
-        _numskim["Mean"] = H.calculate_means(data, cols)
-        _numskim["Std"] = H.calculate_sd(data, cols)
-        _numskim["Q0"] = q0
-        _numskim["Q25"] = q25
-        _numskim["Q50"] = q50
-        _numskim["Q75"] = q75
-        _numskim["Q100"] = q100
-        _numskim["Skew"] = H.calculate_skew(data, cols)
-        _numskim["Kurt"] = H.calculate_kurosis(data, cols)
-        _numskim["Dist"] = H.draw_distribitions(data, cols)
-        self.skimmer["numeric"] = _numskim
+        q0, q25, q50, q75, q100 = H.calculate_quantiles(subset)
+        _min, _max = H.columns_min_max(subset, cols)
+        data["Variable"] = cols
+        data["Count_total"] = H.count_columns_values(subset, cols)
+        data["Count_missing"] = H.count_missing_values(subset, cols)
+        data["Min"] = _min
+        data["Max"] = _max
+        data["Mean"] = H.calculate_means(subset, cols)
+        data["Std"] = H.calculate_sd(subset, cols)
+        data["Q0"] = q0
+        data["Q25"] = q25
+        data["Q50"] = q50
+        data["Q75"] = q75
+        data["Q100"] = q100
+        data["Skew"] = H.calculate_skew(subset, cols)
+        data["Kurt"] = H.calculate_kurosis(subset, cols)
+        data["Dist"] = H.draw_distribitions(subset, cols)
+        return data
 
-
-def skim(data: pd.DataFrame, choices: List[str] = None) -> None:
-    """
-    Summarize data present in a Pandas DataFrame
-
-    Parameters:
-    -----------
-    - data: A Pandas DataFrame
-
-    Raise
-    -----
-    An TypeError if an object other than a Pandas DataFrame is passed
-    as an argument
-    """
-    if not isinstance(data, pd.DataFrame):
-        raise TypeError(
-            """
-            For now,the skim functions only accepts Pandas DataFrames
-            """
-            )
-    # instantiate the rich Console object
-    console = Console()
-    # instantiate the skimmer object
-    skimmer = Skimer(data)
-    skimmer.set_skimmers()
-
-    def _build_rich_grid(summary: dict, title: str) -> Table:
-        columns, values = summary.keys(), list(summary.values())
-        size = len(values[0])
-        rows = [[row[i] for row in values] for i in range(size)]
-        grid = Table(
-            box=box.SIMPLE,
-            show_header=True,
-            header_style="italic",
-            title="  Variable type: {}".format(title),
-            title_justify="left",
-            title_style="bold",
-            )
-        for col in columns:
-            grid.add_column(col)
-        for row in rows:
-            grid.add_row(*row)
-        return grid
-    console.clear()
-
-    for key, value in skimmer.skimmer.items():
-        console.print(_build_rich_grid(value, key))
-
-
-data = pd.read_csv("tests/data/iris.csv")
-skim(data)
+    def __skim(self):
+        data = defaultdict(dict)
+        data["summary"] = self.__summary()
+        data["numeric"] = self.__numeric()
+        return data
