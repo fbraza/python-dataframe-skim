@@ -48,9 +48,14 @@ class Skim:
         for key, value in data.items():
             console.print(_build_rich_grid(value, key))
 
-    def __summary(self):
+    def __summary(self) -> Dict[str, List[str]]:
         """
-        TODO
+        Compute the number of rows, columns and frequency of
+        data types in a Pandas DataFrame.
+
+        Return:
+        -------
+            Dict[str, List[str]]
         """
         rows, cols = self._obj.shape[0], self._obj.shape[1]
         data = defaultdict(list)
@@ -91,8 +96,45 @@ class Skim:
         data["Dist"] = H.draw_distribitions(subset, cols)
         return data
 
-    def __skim(self):
+    def __object(self) -> Union[Dict[str, List], Dict[str, bool]]:
+        data = defaultdict(list)
+        subset = H.columns_with_type(self._obj, "object")
+        cols = H.list_columns(subset)
+        _min, _max = H.columns_lenmin_lenmax(subset, cols)
+        if not cols:
+            return {"empty": True}
+        data["Variable"] = cols
+        data["Count_total"] = H.count_columns_values(subset, cols)
+        data["Count_missing"] = H.count_missing_values(subset, cols)
+        data["Min"] = _min
+        data["Max"] = _max
+        return data
+
+    def __skim(self) -> Dict[str, Dict[str, List[str]]]:
         data = defaultdict(dict)
         data["summary"] = self.__summary()
         data["numeric"] = self.__numeric()
+        data["object"] = self.__object()
         return data
+
+
+data = pd.read_csv("tests/data/iris.csv")
+data.skim.print()
+# For objects / String
+#   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
+# 1 name                  0         1         3    21     0       87          0
+# 2 hair_color            5         0.943     4    13     0       12          0
+# 3 skin_color            0         1         3    19     0       31          0
+# 4 eye_color             0         1         3    13     0       15          0
+# 5 sex                   4         0.954     4    14     0        4          0
+# 6 gender                4         0.954     8     9     0        2          0
+# 7 homeworld            10         0.885     4    14     0       48          0
+# 8 species               4         0.954     3    14     0       37          0
+
+# For category
+#   skim_variable n_missing complete_rate ordered n_unique top_counts
+# 1 Species               0             1 FALSE          3 set: 50, ver: 50, vir: 50
+
+# For date
+# n_missing complete_rate ordered min max
+

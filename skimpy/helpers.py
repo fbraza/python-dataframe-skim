@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from typing import List, Optional, Tuple
 from collections import Counter
-
+# from pyspark.sql import DataFrame
 
 TYPES = {
     "numeric": [
@@ -235,4 +235,17 @@ def columns_min_max(
     _min = [str(data[column].min()) for column in columns]
     _max = [str(data[column].max()) for column in columns]
     return (_min, _max)
+
+
+def columns_lenmin_lenmax(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> Tuple[List[str], ...]:
+    """
+    TODO
+    """
+    length_df = data.copy()
+    for column in columns:
+        length_df[column] = length_df[column].str.len()
+    return columns_min_max(length_df, columns)
 
