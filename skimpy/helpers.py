@@ -38,10 +38,11 @@ def columns_with_type(
     Args:
     -----
     - data:
-    - dtype: stting ("numeric", "object", "category", "date")
+    - dtype: string can be "numeric", "object", "category" or "date"
 
     Return:
     -------
+    A pandas DataFrame
     """
     def is_type_in(_dtype: str) -> bool:
         return _dtype in TYPES[dtype]
@@ -78,11 +79,11 @@ def calculate_quantiles(
 
     Args:
     -----
-    - data:
+    - data: a pandas DataFrame
 
     Return:
     -------
-
+    A tuple(list(str...))
     """
     q0, q25, q50, q75, q100 = data.quantile([.0, .25, .50, .75, 1.0]).values
     q0 = [str(value) for value in q0]
@@ -102,12 +103,12 @@ def calculate_means(
 
     Args:
     -----
-    - data:
-    - columns:
+    - data: a pandas DataFrame
+    - columns: a list of string with columns names
 
     Return:
     -------
-
+    A list of string for formating purpose with rich
     """
     return [str(round(data[column].mean(), 3)) for column in columns]
 
@@ -121,12 +122,12 @@ def calculate_sd(
 
     Args:
     -----
-    - data:
-    - columns:
+    - data: a pandas DataFrame
+    - columns: a list of string with columns names
 
     Return:
     -------
-
+    A list of string for formating purpose with rich
     """
     return [str(round(data[column].std(), 3)) for column in columns]
 
@@ -141,13 +142,13 @@ def calculate_skew(
 
     Args:
     -----
-    - data:
-    - columns:
-    - skipna:
+    - data: a pandas DataFrame
+    - columns: a list of string with columns names
+    - skipna: a boolean, to take into account np.na values
 
     Return:
     -------
-
+    A list of string for formating purpose with rich
     """
     return [str(round(data[column].skew(skipna=skipna), 3)) for column in columns]
 
@@ -162,13 +163,13 @@ def calculate_kurosis(
 
     Args:
     -----
-    - data:
-    - columns:
-    - skipna:
+    - data: a pandas DataFrame
+    - columns: a list of string with columns names
+    - skipna: a boolean, to take into account np.na values
 
     Return:
     -------
-
+    A list of string for formating purpose with rich
     """
     return [str(round(data[column].kurtosis(skipna=skipna), 3))
             for column in columns]
@@ -179,10 +180,20 @@ def spark_bar(
     bins: int = 10
 ) -> str:
     """
-    TODO
+    Draw histogram from an array of data points
+
+    Args:
+    -----
+    - data: a pandas Series
+    - bins: an int that defines the number of bins (10 by default)
+
+    Return:
+    -------
+    A string of rectangle unicode
     """
     bars = u" ▁▂▃▄▅▆▇█"
-    n, _ = np.histogram(data, bins=bins)
+    _data = data[~data.isna()]
+    n, _ = np.histogram(_data, bins=bins)
     temp = n * (len(bars) - 1) // (max(n))
     hist = u"".join(bars[i] for i in temp)
     return hist
@@ -232,8 +243,8 @@ def columns_min_max(
     """
     TODO
     """
-    _min = [str(data[column].min()) for column in columns]
-    _max = [str(data[column].max()) for column in columns]
+    _min: List[str] = [str(data[column].min()) for column in columns]
+    _max: List[str] = [str(data[column].max()) for column in columns]
     return (_min, _max)
 
 
@@ -244,8 +255,7 @@ def columns_lenmin_lenmax(
     """
     TODO
     """
-    length_df = data.copy()
+    length_df: pd.DataFrame = data.copy()
     for column in columns:
         length_df[column] = length_df[column].str.len()
     return columns_min_max(length_df, columns)
-

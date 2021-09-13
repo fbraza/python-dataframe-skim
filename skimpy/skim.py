@@ -108,6 +108,9 @@ class Skim:
         data["Count_missing"] = H.count_missing_values(subset, cols)
         data["Min"] = _min
         data["Max"] = _max
+        # data[empty] --> empty string ""
+        # n_unique values
+        # Whitespaces
         return data
 
     def __skim(self) -> Dict[str, Dict[str, List[str]]]:
@@ -136,5 +139,5 @@ data.skim.print()
 # 1 Species               0             1 FALSE          3 set: 50, ver: 50, vir: 50
 
 # For date
-# n_missing complete_rate ordered min max
+# n_missing complete_rate ordered_true min max format
 
