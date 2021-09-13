@@ -1,4 +1,4 @@
-from skimpy.helpers import columns_with_type, list_columns, calculate_quantiles
+from skimpy.helpers import columns_with_type, draw_distribitions, list_columns, calculate_quantiles, spark_bar, draw_distribitions
 
 
 def test_list_columns_should_return_a_list_of_columns_name(iris_csv):
@@ -33,3 +33,17 @@ def test_calculate_quantiles_should_return_quantiles_values(fake_data):
            ["7.0", "8.0", "9.0"])
     res = calculate_quantiles(fake_data)
     assert exp == res
+
+def test_spark_bar_should_return_one_histogram_distribution(iris_sepal_length):
+    exp = u"▂▆▄█▄▇▅▁▁▁"
+    res = spark_bar(iris_sepal_length)
+    assert exp == res
+
+def test_draw_distribution_should_return_histogram_distribution_for_each_numeric_column(iris_numeric): # noqa: 501
+    exp = [u"▂▆▄█▄▇▅▁▁▁", u" ▁▄▅█▆▁▂  ", u"█▂  ▁▅▆▃▂▁", u"█▁ ▁▁▆▁▄▁▂"]
+    res = draw_distribitions(iris_numeric, list_columns(iris_numeric))
+    assert exp == res
+
+"""
+[u"▂▆▄█▄▇▅▁▁▁", u" ▁▄▅█▆▁▂  ", u"█▂  ▁▅▆▃▂▁", u"█▁ ▁▁▆▁▄▁▂"]
+"""  
