@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from typing import List, Optional, Tuple
 from collections import Counter
+
 # from pyspark.sql import DataFrame
 
 TYPES = {
@@ -212,7 +213,7 @@ def count_types_freq(
     """
     TODO
     """
-    types = [str(dtype) for dtype in data.dtypes]
+    types: List[str] = [str(dtype) for dtype in data.dtypes]
     return Counter(types)
 
 
@@ -243,8 +244,8 @@ def columns_min_max(
     """
     TODO
     """
-    _min: List[str] = [str(data[column].min()) for column in columns]
-    _max: List[str] = [str(data[column].max()) for column in columns]
+    _min = [str(int(data[column].loc[~data[column].isna()].min())) for column in columns]
+    _max = [str(int(data[column].loc[~data[column].isna()].max())) for column in columns]
     return (_min, _max)
 
 
@@ -255,7 +256,28 @@ def columns_lenmin_lenmax(
     """
     TODO
     """
-    length_df: pd.DataFrame = data.copy()
+    length_df = data.copy()
     for column in columns:
         length_df[column] = length_df[column].str.len()
     return columns_min_max(length_df, columns)
+
+
+def count_empty_strings(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> List[str]:
+    """
+    TODO
+    """
+    return [str((data[column] == "").sum()) for column in columns]
+
+
+def count_distinct(
+    data: pd.DataFrame,
+    columns: List[str]
+) -> List[str]:
+    """
+    TODO
+    """
+    return [str(data[column].unique().size) for column in columns]
+

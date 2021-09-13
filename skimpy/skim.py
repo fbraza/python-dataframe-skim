@@ -25,7 +25,7 @@ class Skim:
         console = Console()
         # instantiate the skimmer object
         data = self.__skim()
-
+        # a function to build the rich tables
         def _build_rich_grid(summary: dict, title: str) -> Table:
             columns, values = summary.keys(), list(summary.values())
             size = len(values[0])
@@ -80,8 +80,8 @@ class Skim:
         q0, q25, q50, q75, q100 = H.calculate_quantiles(subset)
         _min, _max = H.columns_min_max(subset, cols)
         data["Variable"] = cols
-        data["Count_total"] = H.count_columns_values(subset, cols)
-        data["Count_missing"] = H.count_missing_values(subset, cols)
+        data["N_total"] = H.count_columns_values(subset, cols)
+        data["N_missing"] = H.count_missing_values(subset, cols)
         data["Min"] = _min
         data["Max"] = _max
         data["Mean"] = H.calculate_means(subset, cols)
@@ -104,11 +104,12 @@ class Skim:
         if not cols:
             return {"empty": True}
         data["Variable"] = cols
-        data["Count_total"] = H.count_columns_values(subset, cols)
-        data["Count_missing"] = H.count_missing_values(subset, cols)
+        data["N_total"] = H.count_columns_values(subset, cols)
+        data["N_missing"] = H.count_missing_values(subset, cols)
         data["Min"] = _min
         data["Max"] = _max
-        # data[empty] --> empty string ""
+        data["N_empty_string"] = H.count_empty_strings(subset, cols)
+        data["N_distinct"] = H.count_distinct(subset, cols)
         # n_unique values
         # Whitespaces
         return data
@@ -121,7 +122,7 @@ class Skim:
         return data
 
 
-data = pd.read_csv("tests/data/iris.csv")
+data = pd.read_csv("tests/data/characters.csv")
 data.skim.print()
 # For objects / String
 #   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
