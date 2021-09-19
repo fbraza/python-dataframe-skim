@@ -42,8 +42,4 @@ def test_spark_bar_should_return_one_histogram_distribution(iris_sepal_length):
 def test_draw_distribution_should_return_histogram_distribution_for_each_numeric_column(iris_numeric): # noqa: 501
     exp = [u"▂▆▄█▄▇▅▁▁▁", u" ▁▄▅█▆▁▂  ", u"█▂  ▁▅▆▃▂▁", u"█▁ ▁▁▆▁▄▁▂"]
     res = draw_distribitions(iris_numeric, list_columns(iris_numeric))
-    assert exp == res
-
-"""
-[u"▂▆▄█▄▇▅▁▁▁", u" ▁▄▅█▆▁▂  ", u"█▂  ▁▅▆▃▂▁", u"█▁ ▁▁▆▁▄▁▂"]
-"""  
+    assert exp == res  

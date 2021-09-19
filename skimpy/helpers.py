@@ -151,7 +151,7 @@ def calculate_skew(
     -------
     A list of string for formating purpose with rich
     """
-    return [str(round(data[column].skew(skipna=skipna), 3)) for column in columns]
+    return [str(round(data[column].skew(skipna=skipna), 3)) for column in columns] # noqa: 501
 
 
 def calculate_kurosis(
@@ -172,8 +172,7 @@ def calculate_kurosis(
     -------
     A list of string for formating purpose with rich
     """
-    return [str(round(data[column].kurtosis(skipna=skipna), 3))
-            for column in columns]
+    return [str(round(data[column].kurtosis(skipna=skipna), 3)) for column in columns] # noqa: 501
 
 
 def spark_bar(
@@ -244,8 +243,8 @@ def columns_min_max(
     """
     TODO
     """
-    _min = [str(int(data[column].loc[~data[column].isna()].min())) for column in columns]
-    _max = [str(int(data[column].loc[~data[column].isna()].max())) for column in columns]
+    _min = [str(int(data[column].loc[~data[column].isna()].min())) for column in columns] # noqa: 501
+    _max = [str(int(data[column].loc[~data[column].isna()].max())) for column in columns] # noqa: 501
     return (_min, _max)
 
 
@@ -280,4 +279,3 @@ def count_distinct(
     TODO
     """
     return [str(data[column].unique().size) for column in columns]
-

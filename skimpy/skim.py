@@ -1,5 +1,12 @@
+"""
+This module contains the code necessary to skim pandas DataFrame.
+It will output a statistic summary of your dataset in your terminal.
+You can select columns by their datatypes and also print a markdown
+report.
+"""
+
 import pandas as pd
-import helpers as H
+import skimpy.helpers as H
 from collections import defaultdict
 from typing import List, Dict, Union
 from rich.console import Console
@@ -9,8 +16,8 @@ from rich import box
 
 @pd.api.extensions.register_dataframe_accessor("skim")
 class Skim:
-    """TODO"""
 
+    """TODO"""
     def __init__(self, pandas_obj):
         self.__typecheck(pandas_obj)
         self._obj = pandas_obj
@@ -18,7 +25,7 @@ class Skim:
     @staticmethod
     def __typecheck(input):
         if not isinstance(input, pd.DataFrame):
-            raise AttributeError("skim accessor should called on a pandas DataFrame")
+            raise AttributeError("skim accessor should called on a pandas DataFrame") # noqa: 501
 
     def print(self):
         # instantiate the rich Console object
@@ -26,6 +33,7 @@ class Skim:
         # instantiate the skimmer object
         data = self.__skim()
         # a function to build the rich tables
+
         def _build_rich_grid(summary: dict, title: str) -> Table:
             columns, values = summary.keys(), list(summary.values())
             size = len(values[0])
@@ -119,11 +127,11 @@ class Skim:
         data["summary"] = self.__summary()
         data["numeric"] = self.__numeric()
         data["object"] = self.__object()
-        return data
+        return {k: v for k, v in data.items() if not v.get("empty")}
 
-
-data = pd.read_csv("tests/data/characters.csv")
+data = pd.read_csv("tests/data/iris.csv")
 data.skim.print()
+
 # For objects / String
 #   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
 # 1 name                  0         1         3    21     0       87          0
@@ -141,4 +149,3 @@ data.skim.print()
 
 # For date
 # n_missing complete_rate ordered_true min max format
-
