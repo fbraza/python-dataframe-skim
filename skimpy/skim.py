@@ -6,17 +6,15 @@ report.
 """
 
 import pandas as pd
-import skimpy.helpers as H
+import helpers as H
 from collections import defaultdict
 from typing import List, Dict, Union
 from rich.console import Console
 from rich.table import Table
 from rich import box
 
-
 @pd.api.extensions.register_dataframe_accessor("skim")
 class Skim:
-
     """TODO"""
     def __init__(self, pandas_obj):
         self.__typecheck(pandas_obj)
@@ -52,7 +50,7 @@ class Skim:
                 grid.add_row(*row)
             return grid
         # clear screen
-        console.clear()
+        # console.clear()
         for key, value in data.items():
             console.print(_build_rich_grid(value, key))
 
@@ -118,8 +116,15 @@ class Skim:
         data["Max"] = _max
         data["N_empty_string"] = H.count_empty_strings(subset, cols)
         data["N_distinct"] = H.count_distinct(subset, cols)
-        # n_unique values
-        # Whitespaces
+        return data
+
+    def __date(self) -> Union[Dict[str, List], Dict[str, bool]]:
+        data = defaultdict(list)
+        subset = H.columns_with_type(self._obj, "date")
+        cols = H.list_columns(subset)
+        if not cols:
+            return {"empty": True}
+        data["Variable"] = cols
         return data
 
     def __skim(self) -> Dict[str, Dict[str, List[str]]]:
@@ -129,23 +134,10 @@ class Skim:
         data["object"] = self.__object()
         return {k: v for k, v in data.items() if not v.get("empty")}
 
-data = pd.read_csv("tests/data/iris.csv")
+
+data = pd.read_csv("../tests/data/date_example.csv")
+data["Start Date"] = pd.to_datetime(data["Start Date"])
 data.skim.print()
-
-# For objects / String
-#   skim_variable n_missing complete_rate   min   max empty n_unique whitespace
-# 1 name                  0         1         3    21     0       87          0
-# 2 hair_color            5         0.943     4    13     0       12          0
-# 3 skin_color            0         1         3    19     0       31          0
-# 4 eye_color             0         1         3    13     0       15          0
-# 5 sex                   4         0.954     4    14     0        4          0
-# 6 gender                4         0.954     8     9     0        2          0
-# 7 homeworld            10         0.885     4    14     0       48          0
-# 8 species               4         0.954     3    14     0       37          0
-
-# For category
-#   skim_variable n_missing complete_rate ordered n_unique top_counts
-# 1 Species               0             1 FALSE          3 set: 50, ver: 50, vir: 50
 
 # For date
 # n_missing complete_rate ordered_true min max format

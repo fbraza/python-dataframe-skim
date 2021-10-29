@@ -25,6 +25,9 @@ TYPES = {
         ],
     "category": [
         "category"
+    ],
+    "date": [
+        "datetime64[ns]"
     ]
 }
 
