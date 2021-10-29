@@ -19,11 +19,10 @@ def test_columns_with_type_dtype_object_should_return_object_cols(iris_csv):
     assert exp_cols == list_columns(res_cols)
 
 
-def test_columns_with_type_dtype_category_should_return_no_cols(iris_csv):
-    exp_cols = []
-    res_cols = columns_with_type(iris_csv, "category")
+def test_columns_with_type_dtype_datetime_should_return_date_cols(date_example):
+    exp_cols = ['Start Date']
+    res_cols = columns_with_type(date_example, "date")
     assert exp_cols == list_columns(res_cols)
-
 
 def test_calculate_quantiles_should_return_quantiles_values(fake_data):
     exp = (["1.0", "3.0", "0.0"],

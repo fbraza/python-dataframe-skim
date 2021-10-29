@@ -25,3 +25,11 @@ def fake_data():
     values = [[4, 5, 6], [7, 8, 9], [1, 3, 0]]
     columns = ["column_1", "column_2", "column_3"]
     return pd.DataFrame(columns=columns, data=values)
+
+
+@pytest.fixture
+def date_example():
+    data = pd.read_csv("tests/data/date_example.csv")
+    data["Start Date"] = pd.to_datetime(data["Start Date"])
+    return data
+
